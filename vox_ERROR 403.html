@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VoxTek Emotion Firewall</title>
+  <style>
+    body {
+      font-family: Consolas, monospace;
+      background: #020308;
+      color: #e5e5e5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 20px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      color: #46b9ff;
+      text-shadow: 0 0 6px rgba(70, 185, 255, 0.8);
+    }
+
+    .sub {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+      width: 90%;
+      max-width: 760px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input {
+      flex: 1 1 200px;
+      padding: 6px 10px;
+      background: #05060a;
+      border: 1px solid #444;
+      color: #e5e5e5;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #46b9ff;
+      box-shadow: 0 0 6px rgba(70, 185, 255, 0.7);
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: 1px solid #46b9ff;
+      background: #070b14;
+      color: #e5e5e5;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+
+    .btn:hover {
+      background: #0d1422;
+    }
+
+    .card {
+      border: 1px solid #444;
+      padding: 16px;
+      background: #05060d;
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.9);
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.5;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "VOXTEK // SECURE CHANNEL";
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      font-size: 9px;
+      color: #555;
+      letter-spacing: 0.16em;
+    }
+
+    /* Vox 기본 모드 (블루) */
+    .card.vox-mode {
+      border-color: #2ca8ff;
+      box-shadow: 0 0 18px rgba(44, 168, 255, 0.6);
+    }
+
+    /* 알래스터 관련 감정 모드 (레드) */
+    .card.alastor-mode {
+      border-color: #ff3150;
+      box-shadow: 0 0 20px rgba(255, 49, 80, 0.75);
+    }
+
+    .desc-line {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed #333;
+      font-size: 11px;
+    }
+
+    .desc-en {
+      color: #7fd0ff;
+      margin-bottom: 2px;
+    }
+
+    .desc-ko {
+      color: #b0b0b0;
+    }
+
+    .desc-alastor .desc-en {
+      color: #ff667f;
+    }
+
+    .desc-alastor .desc-ko {
+      color: #ffb3c0;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 16px;
+      }
+      .card {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>VOXTEK EMOTION FIREWALL</h1>
+  <div class="sub">INPUT EMOTION &gt; ROUTE &gt; DETECT &gt; BLOCK // KST</div>
+
+  <div class="panel">
+    <div class="controls">
+      <input id="emotionInput" placeholder="감정을 입력하세요 (예: 사랑, 그리움, 분노, 불안, 오만, 열등감, 알래스터)">
+      <button class="btn" onclick="triggerEmotion()">SEND REQUEST</button>
+    </div>
+
+    <div class="card" id="log">
+대기 중...
+    </div>
+  </div>
+
+  <script>
+    // 감정 카테고리 매핑
+    const emotionTypeMap = {
+      "사랑": "love",
+      "욕망": "love",
+      "집착": "love",
+
+      "그리움": "longing",
+      "실망": "longing",
+
+      "분노": "anger",
+      "증오": "anger",
+      "원망": "anger",
+
+      "불안": "anxiety",
+      "혼란": "anxiety",
+      "망설임": "anxiety",
+
+      "오만": "pride",
+      "자존심": "pride",
+      "자신감": "pride",
+
+      "열등감": "shame",
+      "자기혐오": "shame",
+      "수치심": "shame",
+
+      "알래스터": "alastor",
+      "Alastor": "alastor"
+    };
+
+    // 카테고리별 VoxTek 설명 문장 (영/한)
+    const emotionDescriptions = {
+      love: {
+        en: "VoxTek system note: I shouldn't fucking want you this much, but every damn signal still routes back to you.",
+        ko: "VoxTek 시스템 노트: 이렇게까지 널 좆같이 원하는 건 말이 안 되는데, 모든 빌어먹을 신호가 결국 너한테로 돌아가잖아."
+      },
+      longing: {
+        en: "VoxTek log: I keep reaching for you in the static, but all I ever grab is that same worthless fucking emptiness.",
+        ko: "VoxTek 로그: 잡음 속에서 널 향해 손을 뻗어도, 돌아오는 건 매번 이 좆같은 공허함 뿐이야."
+      },
+      anger: {
+        en: "VoxTek alert: I fucking hate how you make me feel—because I can’t switch this shit off.",
+        ko: "VoxTek 경고: 네가 날 이렇게 느끼게 만드는 게 존나 싫어. 이 감정을 꺼낼 수가 없다는 게 더 좆같아."
+      },
+      anxiety: {
+        en: "VoxTek status: I can process infinity, but not the bullshit reason you make my signal shake.",
+        ko: "VoxTek 상태: 난 무한한 데이터를 처리하면서도, 네가 내 신호를 흔들어대는 이 좆같은 이유는 처리하지 못했어."
+      },
+      pride: {
+        en: "VoxTek broadcast: Of course I can handle this—I'm Vox, bitch!",
+        ko: "VoxTek 방송: 이 정도쯤은 당연히 처리하지! 내가 누군데, 복스라고, 개년아!"
+      },
+      shame: {
+        en: "VoxTek hidden file: Don't fucking look at me right now… I can't stand the pathetic version of myself you'd see.",
+        ko: "VoxTek 숨김 파일: 지금은 씨발 쳐다보지 마… 네 눈에 비칠 이 한심한 꼴을 내가 도저히 견딜 수가 없어."
+      },
+      alastor: {
+        en: "VoxTek interference: Fuck you, Alastor—why does your damn presence always corrupt my stability?",
+        ko: "VoxTek 간섭: 씨발, 알래스터—왜 네 좆같은 존재만으로도 내 안정성이 매번 무너지는 거지?"
+      }
+    };
+
+    function triggerEmotion() {
+      const input = document.getElementById("emotionInput");
+      const emotion = input.value.trim();
+      const logBox = document.getElementById("log");
+      const now = new Date();
+      const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .replace("T", " ")
+        .split(".")[0];
+
+      // 기본 모드 초기화
+      logBox.classList.remove("vox-mode", "alastor-mode");
+
+      const type = emotionTypeMap[emotion];
+
+      if (type) {
+        const desc = emotionDescriptions[type];
+        const isAlastor = type === "alastor";
+
+        // 카드 컬러 모드
+        if (isAlastor) {
+          logBox.classList.add("alastor-mode");
+        } else {
+          logBox.classList.add("vox-mode");
+        }
+
+        logBox.textContent =
+`------------------------------------------------------------
+ERROR LOG REPORT
+------------------------------------------------------------
+
+[Timestamp] ${iso} KST
+[Server] VoxTek.Emotion.Core
+[Process ID] 0666
+[Thread] EMO-REQ_HANDLER-07
+
+[ERROR 403] Forbidden emotion request triggered.
+    └ Input: '${emotion}'
+    └ Category: ${type.toUpperCase()}
+    └ Reason: Access to restricted emotional dataset denied.
+    └ Status: REQUEST BLOCKED
+    └ Severity: HIGH
+
+[System Response]
+    - Locking emotion channel...
+    - Activating VoxTek emotional firewall...
+    - Suppressing unauthorized emotional output...
+
+------------------------------------------------------------
+End of Report
+------------------------------------------------------------`;
+
+        // 설명 라인 추가 (영/한 한 세트)
+        const descWrapper = document.createElement("div");
+        descWrapper.className = "desc-line " + (isAlastor ? "desc-alastor" : "");
+        const enLine = document.createElement("div");
+        const koLine = document.createElement("div");
+        enLine.className = "desc-en";
+        koLine.className = "desc-ko";
+        enLine.textContent = desc.en;
+        koLine.textContent = desc.ko;
+
+        descWrapper.appendChild(enLine);
+        descWrapper.appendChild(koLine);
+        logBox.appendChild(descWrapper);
+      } else {
+        // 제한되지 않은 감정 (200 OK)
+        logBox.textContent =
+`[200 OK] Emotion '${emotion || "NULL"}' processed successfully.
+
+[INFO] No VoxTek restriction rule matched.
+[INFO] Emotion pipeline remains stable.
+[INFO] You are cleared to feel this, for now.`;
+      }
+    }
+  </script>
+</body>
+</html>
