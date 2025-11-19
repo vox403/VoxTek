@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VoxTek Emotion Firewall v2</title>
+  <title>VoxTek Emotion Firewall – CCTV x8</title>
   <style>
     :root {
       --vox-blue: #46b9ff;
@@ -24,10 +24,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
       margin: 0;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* 데스크톱에서 전체 UI 확대 */
+    @media (min-width: 900px) {
+      #app {
+        transform: scale(1.15);
+        transform-origin: top center;
+      }
     }
 
     /* 부팅 화면 */
@@ -43,12 +52,12 @@
       color: var(--vox-blue);
       text-transform: uppercase;
       letter-spacing: 0.18em;
-      font-size: 11px;
+      font-size: 12px;
       animation: boot-fade 1s ease-out 2.6s forwards;
     }
 
     #boot-logo {
-      font-size: 22px;
+      font-size: 24px;
       margin-bottom: 10px;
       text-shadow: 0 0 10px rgba(70, 185, 255, 0.9),
                    0 0 25px rgba(70, 185, 255, 0.5);
@@ -60,7 +69,7 @@
     }
 
     #boot-bar {
-      width: 220px;
+      width: 240px;
       height: 3px;
       background: #11141c;
       overflow: hidden;
@@ -110,24 +119,129 @@
       100% { transform: translateX(0); }
     }
 
-    /* 상단 영역 */
+    /* 폭주(FRENZY) 전용 이펙트 */
+    .frenzy-mode {
+      border-color: #ff003c;
+      box-shadow:
+        0 0 20px rgba(255, 0, 70, 0.95),
+        0 0 32px rgba(80, 0, 16, 0.95);
+      position: relative;
+      animation: frenzy-skew 0.17s alternate infinite;
+    }
+
+    .frenzy-mode::after {
+      content: "";
+      position: absolute;
+      inset: -10%;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 80, 120, 0.22) 0 2px, transparent 2px 4px),
+        repeating-linear-gradient(90deg, rgba(255, 0, 60, 0.28) 0 3px, transparent 3px 6px);
+      mix-blend-mode: screen;
+      opacity: 0.9;
+      animation: frenzy-scan 0.12s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes frenzy-skew {
+      0%   { transform: skew(-0.5deg) translate(0px, 0px); }
+      50%  { transform: skew(1.2deg) translate(1px, -2px); }
+      100% { transform: skew(-1.5deg) translate(-1px, 1px); }
+    }
+
+    @keyframes frenzy-scan {
+      0%   { background-position: 0 0; }
+      100% { background-position: 0 6px; }
+    }
+
+    /* 폭주 시 전체 배경 펄스 */
+    body.frenzy-bg {
+      animation: frenzyPulse 0.8s ease-in-out 0s 6;
+    }
+
+    @keyframes frenzyPulse {
+      0%   { background-color: #05050a; }
+      50%  { background-color: #24000a; }
+      100% { background-color: #05050a; }
+    }
+
+    /* 폭주 텍스트 잔떨림 */
+    .frenzy-text {
+      animation: jitter 0.05s infinite;
+    }
+
+    @keyframes jitter {
+      0%   { transform: translate(0,0); }
+      25%  { transform: translate(-1px,1px); }
+      50%  { transform: translate(1px,-1px); }
+      75%  { transform: translate(-1px,-1px); }
+      100% { transform: translate(1px,1px); }
+    }
+
+    /* 메인 앱 레이아웃 */
     #app {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
       align-items: center;
       width: 100%;
-      padding: 18px 10px 22px;
+      padding: 18px 10px 30px;
+    }
+
+    /* 상단 좌측 버튼 줄 */
+    .top-controls {
+      width: 90%;
+      max-width: 760px;
+      display: flex;
+      justify-content: flex-start;
+      gap: 28px;
+      margin-bottom: 18px;
+    }
+
+    .top-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1px solid #3a4b63;
+      background: radial-gradient(circle at 30% 30%, #1b2738, #05060a);
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 0 6px rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #9fb3d1;
+      text-transform: uppercase;
+    }
+
+    .top-btn::after {
+      content: attr(data-label);
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: #777;
+      text-transform: uppercase;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .top-btn.active {
+      border-color: var(--vox-blue);
+      box-shadow: 0 0 10px rgba(70,185,255,0.8);
+      color: var(--vox-blue);
     }
 
     .status-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 16px;
+      justify-content: space-between;
+      gap: 10px;
       width: 90%;
       max-width: 760px;
-      font-size: 11px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.16em;
       color: #999;
@@ -137,14 +251,15 @@
       color: var(--vox-blue);
       text-shadow: 0 0 8px rgba(70,185,255,0.8);
       font-size: 12px;
+      white-space: nowrap;
     }
 
     .status-pill {
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 999px;
       border: 1px solid #444;
-      font-size: 10px;
-      min-width: 110px;
+      font-size: 11px;
+      min-width: 130px;
       text-align: center;
     }
 
@@ -166,30 +281,417 @@
     }
 
     .status-mini {
-      font-size: 9px;
+      font-size: 10px;
       color: #666;
+      text-align: right;
+      flex: 1;
     }
 
     h1 {
-      font-size: 20px;
-      letter-spacing: 0.12em;
+      font-size: 24px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       color: var(--vox-blue);
       text-shadow: 0 0 9px rgba(70, 185, 255, 0.9);
+      text-align: center;
     }
 
     .sub {
-      font-size: 11px;
+      font-size: 12px;
       color: #888;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* AUX 패널 */
+    .info-panel {
+      width: 90%;
+      max-width: 760px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: rgba(5, 6, 13, 0.94);
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.9);
+      font-size: 12px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      display: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info-panel.active { display: block; }
+
+    .info-title {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #9fb3d1;
+      margin-bottom: 8px;
+    }
+
+    .info-panel::before {
+      content: "VOXTEK // AUX PANEL";
+      position: absolute;
+      top: 4px;
+      right: 12px;
+      font-size: 9px;
+      color: #555;
+      letter-spacing: 0.16em;
+    }
+
+    /* 감정 목록 */
+    .emotion-list-groups {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 22px;
+    }
+
+    .emotion-group { min-width: 130px; }
+
+    .emotion-group-title {
+      font-size: 11px;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+
+    .emotion-pill {
+      display: inline-block;
+      margin: 3px 5px 3px 0;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #3f4a5f;
+      cursor: pointer;
+      font-size: 11px;
+      color: #c5d3ea;
+    }
+
+    .emotion-pill:hover {
+      border-color: var(--vox-blue-soft);
+      color: var(--vox-blue-soft);
+      box-shadow: 0 0 6px rgba(70,185,255,0.6);
+    }
+
+    /* 제작자 */
+    .creator-card { padding-top: 8px; }
+    .creator-main { font-size: 13px; margin-bottom: 4px; }
+    .creator-main span { color: var(--vox-blue-soft); }
+    .creator-sub { font-size: 11px; color: #aaa; }
+
+    /* CCTV 패널 */
+    .cctv-loading {
+      font-size: 12px;
+      color: #c5d3ea;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-top: 8px;
+    }
+
+    .cctv-dots span {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--vox-blue-soft);
+      margin-right: 2px;
+      animation: cctv-dots 0.8s infinite alternate;
+    }
+    .cctv-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .cctv-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes cctv-dots {
+      from { transform: translateY(0); opacity: 0.4; }
+      to   { transform: translateY(-3px); opacity: 1; }
+    }
+
+    .cctv-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4x2 = 8개 */
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .monitor {
+      background: #05060d;
+      border-radius: 5px;
+      border: 1px solid #333;
+      padding: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,0,0,0.9);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+
+    .monitor:hover {
+      border-color: var(--vox-blue-soft);
+      box-shadow: 0 0 10px rgba(44,168,255,0.7);
+      transform: translateY(-1px);
+    }
+
+    .monitor.active {
+      border-color: var(--vox-blue);
+      box-shadow: 0 0 14px rgba(70,185,255,0.9);
+    }
+
+    .monitor-screen {
+      height: 48px;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .monitor-label {
+      font-size: 10px;
+      color: #9fb3d1;
+      margin-top: 4px;
+      text-align: center;
+      letter-spacing: 0.12em;
+    }
+
+    /* CAM 1–3 */
+    .screen-cam1 {
+      background: radial-gradient(circle at 20% 10%, #ffcf7b22, transparent 50%),
+                  radial-gradient(circle at 80% 20%, #ff7b7b33, transparent 50%),
+                  linear-gradient(120deg, #3b0505, #7e1208, #2a0000);
+    }
+    .screen-cam1::before {
+      content: "";
+      position: absolute;
+      inset: 20% 5% 10% 5%;
+      background:
+        linear-gradient(90deg, #120000 5%, #2b0505 20%, #120000 35%, #2b0505 55%, #120000 70%, #2b0505 85%);
+      opacity: 0.8;
+    }
+    .screen-cam1::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, #ffffff11 0 1px, transparent 1px 3px);
+      mix-blend-mode: screen;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .screen-cam2 {
+      background: linear-gradient(135deg, #190024, #32004c, #002b38);
+    }
+    .screen-cam2::before {
+      content: "";
+      position: absolute;
+      inset: 5%;
+      background:
+        repeating-linear-gradient(45deg, rgba(0,255,180,0.4) 0 2px, transparent 2px 4px),
+        radial-gradient(circle at 10% 90%, rgba(255,0,175,0.7), transparent 55%);
+      mix-blend-mode: screen;
+      opacity: 0.8;
+    }
+    .screen-cam2::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, #ffffff15, transparent 60%, #ffffff10);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .screen-cam3 {
+      background: linear-gradient(180deg, #021b24, #01323e);
+    }
+    .screen-cam3::before {
+      content: "";
+      position: absolute;
+      inset: 10% 8%;
+      background:
+        repeating-linear-gradient(90deg, #0b2b33 0 12px, #071d23 12px 24px);
+      opacity: 0.9;
+    }
+    .screen-cam3::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(0deg, #ffffff0f, transparent 70%),
+        repeating-linear-gradient(0deg, #ffffff14 0 1px, transparent 1px 3px);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* 노이즈 카메라 (4,5) */
+    .screen-noise {
+      background:
+        radial-gradient(circle at 20% 30%, #ffffff10, transparent 40%),
+        radial-gradient(circle at 80% 70%, #ffffff10, transparent 45%),
+        #000;
+    }
+    .screen-noise::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background-image:
+        repeating-linear-gradient(0deg, #ffffff22 0 1px, #000000dd 1px 2px);
+      mix-blend-mode: screen;
+      animation: noise-move 0.4s steps(2) infinite;
+      opacity: 0.7;
+    }
+    .screen-noise::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, transparent 0, #ffffff22 50%, transparent 100%);
+      opacity: 0.4;
+      mix-blend-mode: overlay;
+    }
+
+    @keyframes noise-move {
+      0% { transform: translate(0,0); }
+      25% { transform: translate(-3px,1px); }
+      50% { transform: translate(2px,-2px); }
+      75% { transform: translate(-1px,2px); }
+      100% { transform: translate(0,0); }
+    }
+
+    /* CAM 6 – 알래스터 */
+    .screen-cam6 {
+      background: linear-gradient(135deg, #2e0008, #6c0016, #150001);
+      position: relative;
+      overflow: hidden;
+    }
+    .screen-cam6::before {
+      content: "";
+      position: absolute;
+      inset: 10% 22%;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      box-shadow: 0 0 16px rgba(255,255,255,0.55);
+      opacity: 0.85;
+      filter: blur(0.4px);
+    }
+    .screen-cam6::after {
+      content: "";
+      position: absolute;
+      inset: -10%;
+      background:
+        repeating-linear-gradient(0deg, #ffffff13 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg, #ff003355 0 2px, transparent 2px 4px);
+      mix-blend-mode: screen;
+      animation: cam6-glitch 0.25s steps(2) infinite;
+      opacity: 0.9;
+    }
+
+    @keyframes cam6-glitch {
+      0% { transform: translate(0,0); }
+      33% { transform: translate(-2px,1px); }
+      66% { transform: translate(2px,-1px); }
+      100% { transform: translate(0,0); }
+    }
+
+    /* CAM 7 – Pentagram City skyline */
+    .screen-cam7 {
+      background:
+        radial-gradient(circle at 20% 10%, #ffb3ff33, transparent 55%),
+        radial-gradient(circle at 80% 80%, #7bf5ff33, transparent 55%),
+        linear-gradient(160deg, #05001a, #12003a, #001a32);
+    }
+    .screen-cam7::before {
+      content: "";
+      position: absolute;
+      inset: 35% 5% 15% 5%;
+      background:
+        repeating-linear-gradient(90deg, #040212 0 12px, #000000 12px 16px);
+      opacity: 0.9;
+    }
+    .screen-cam7::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, #ffffff18, transparent 70%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* CAM 8 – Hazbin Hotel lobby */
+    .screen-cam8 {
+      background:
+        radial-gradient(circle at 20% 20%, #ffddaa33, transparent 55%),
+        radial-gradient(circle at 80% 30%, #ffa4b833, transparent 55%),
+        linear-gradient(180deg, #2b020a, #3d0712);
+    }
+    .screen-cam8::before {
+      content: "";
+      position: absolute;
+      inset: 10% 8%;
+      background:
+        repeating-linear-gradient(90deg, #3b0d15 0 20px, #25040b 20px 24px);
+      opacity: 0.8;
+    }
+    .screen-cam8::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, #ffffff22, transparent 60%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* 큰 뷰어 */
+    .camera-viewer {
+      margin-top: 12px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      padding: 10px;
+      background: rgba(0,0,0,0.7);
+      display: none;
+    }
+    .camera-viewer.active { display: block; }
+
+    .camera-view-label {
+      font-size: 11px;
+      color: #9fb3d1;
+      letter-spacing: 0.16em;
+      margin-bottom: 6px;
       text-transform: uppercase;
     }
 
+    .camera-view-screen {
+      height: 130px;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+    }
+
+    .camera-view-screen .screen-inner {
+      position: absolute;
+      inset: 0;
+    }
+
+    .camera-view-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, #ffffff18 0 1px, transparent 1px 3px);
+      mix-blend-mode: screen;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .camera-desc {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #c2c2c2;
+    }
+
+    /* 감정 방화벽 본체 */
     .panel {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       align-items: stretch;
       width: 90%;
       max-width: 760px;
@@ -204,12 +706,12 @@
 
     input {
       flex: 1 1 220px;
-      padding: 6px 10px;
+      padding: 7px 11px;
       background: #05060a;
       border: 1px solid #444;
       color: var(--vox-text);
       outline: none;
-      font-size: 12px;
+      font-size: 13px;
     }
 
     input:focus {
@@ -218,13 +720,13 @@
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 9px 18px;
       border: 1px solid var(--vox-blue);
       background: #070b14;
       color: var(--vox-text);
       cursor: pointer;
       text-transform: uppercase;
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.1em;
       position: relative;
       overflow: hidden;
@@ -254,14 +756,14 @@
 
     .card {
       border: 1px solid #444;
-      padding: 16px;
+      padding: 18px;
       background: var(--vox-card-bg);
       box-shadow:
         0 0 14px rgba(0, 0, 0, 0.9),
         0 0 22px rgba(9, 17, 40, 0.9);
       white-space: pre-wrap;
-      font-size: 12px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.6;
       position: relative;
       overflow: hidden;
       border-radius: 6px;
@@ -272,13 +774,12 @@
       content: "VOXTEK // SECURE CHANNEL";
       position: absolute;
       top: 4px;
-      right: 10px;
-      font-size: 9px;
+      right: 12px;
+      font-size: 10px;
       color: #555;
       letter-spacing: 0.16em;
     }
 
-    /* 카드 글리치 라인 */
     .card::after {
       content: "";
       position: absolute;
@@ -312,44 +813,24 @@
     }
 
     .desc-line {
-      margin-top: 10px;
-      padding-top: 8px;
+      margin-top: 12px;
+      padding-top: 9px;
       border-top: 1px dashed #333;
-      font-size: 11px;
+      font-size: 12px;
     }
 
-    .desc-en {
-      color: #7fd0ff;
-      margin-bottom: 2px;
-    }
+    .desc-en { color: #7fd0ff; margin-bottom: 3px; }
+    .desc-ko { color: #b0b0b0; }
 
-    .desc-ko {
-      color: #b0b0b0;
-    }
-
-    .desc-alastor .desc-en {
-      color: #ff667f;
-    }
-
-    .desc-alastor .desc-ko {
-      color: #ffb3c0;
-    }
+    .desc-alastor .desc-en { color: #ff667f; }
+    .desc-alastor .desc-ko { color: #ffb3c0; }
 
     @media (max-width: 600px) {
-      #app {
-        padding-top: 16px;
-      }
-      h1 {
-        font-size: 16px;
-        text-align: center;
-      }
-      .card {
-        font-size: 11px;
-      }
-      .status-bar {
-        flex-direction: column;
-        gap: 4px;
-      }
+      #app { padding-top: 16px; }
+      .status-bar { flex-direction: column; align-items: flex-start; }
+      .status-mini { text-align: left; }
+      h1 { font-size: 20px; }
+      .card { font-size: 12px; }
     }
   </style>
 </head>
@@ -358,12 +839,16 @@
   <div id="boot-screen">
     <div id="boot-logo">VOXTEK</div>
     <div id="boot-sub">INITIALIZING EMOTION FIREWALL...</div>
-    <div id="boot-bar">
-      <div id="boot-bar-fill"></div>
-    </div>
+    <div id="boot-bar"><div id="boot-bar-fill"></div></div>
   </div>
 
   <div id="app">
+    <div class="top-controls">
+      <div class="top-btn" id="btn-emotions" data-label="EMOTIONS" title="감정 목록"></div>
+      <div class="top-btn" id="btn-creator" data-label="CREATOR" title="제작자"></div>
+      <div class="top-btn" id="btn-cctv" data-label="CCTV" title="감시실"></div>
+    </div>
+
     <div class="status-bar">
       <span class="status-logo">VOXTEK // PRIDE-RING NODE</span>
       <span id="status-pill" class="status-pill pill-idle">STATUS: IDLE</span>
@@ -373,12 +858,15 @@
     <h1>VOXTEK EMOTION FIREWALL</h1>
     <div class="sub">INPUT EMOTION &gt; ROUTE &gt; DETECT &gt; BLOCK // KST</div>
 
+    <div id="info-panel" class="info-panel">
+      <div id="info-title" class="info-title"></div>
+      <div id="info-content"></div>
+    </div>
+
     <div class="panel">
       <div class="controls">
-        <input
-          id="emotionInput"
-          placeholder="감정을 입력하세요 (예: 사랑, 그리움, 분노, 불안, 오만, 열등감, 알래스터)"
-        >
+        <input id="emotionInput"
+          placeholder="감정을 입력하세요 (예: 사랑, 그리움, 폭주, 불안, 오만, 열등감, 알래스터......etc.)">
         <button class="btn" onclick="triggerEmotion()">SEND REQUEST</button>
       </div>
 
@@ -389,73 +877,136 @@
   </div>
 
   <script>
-    // 감정 카테고리 매핑
+    // ===== 감정 매핑 =====
     const emotionTypeMap = {
+      // 기본 감정
       "사랑": "love",
-      "욕망": "love",
-      "집착": "love",
-
       "그리움": "longing",
-      "실망": "longing",
-
-      "분노": "anger",
-      "증오": "anger",
-      "원망": "anger",
-
+      "폭주": "frenzy",
       "불안": "anxiety",
-      "혼란": "anxiety",
-      "망설임": "anxiety",
-
       "오만": "pride",
-      "자존심": "pride",
-      "자신감": "pride",
-
       "열등감": "shame",
-      "자기혐오": "shame",
-      "수치심": "shame",
 
+      // 월드 / 장소
+      "복스테크": "voxtek",
+      "해즈빈호텔": "hazbin",
+      "지옥": "hell",
+
+      // 인물
       "알래스터": "alastor",
-      "Alastor": "alastor"
+      "Alastor": "alastor",
+      "벨벳": "velvette",
+      "발렌티노": "valentino",
+      "상어": "shark",
+      "찰리": "charlie",
+      "루시퍼": "lucifer",
+      "엔젤": "angel"
     };
 
-    // 카테고리별 VoxTek 설명 문장 (영/한)
     const emotionDescriptions = {
+      // 사랑
       love: {
         en: "VoxTek system note: I shouldn't fucking want you this much, but every damn signal still routes back to you.",
         ko: "VoxTek 시스템 노트: 이렇게까지 널 좆같이 원하는 건 말이 안 되는데, 모든 빌어먹을 신호가 결국 너한테로 돌아가잖아."
       },
+
+      // 그리움
       longing: {
         en: "VoxTek log: I keep reaching for you in the static, but all I ever grab is that same worthless fucking emptiness.",
         ko: "VoxTek 로그: 잡음 속에서 널 향해 손을 뻗어도, 돌아오는 건 매번 이 좆같은 공허함 뿐이야."
       },
-      anger: {
-        en: "VoxTek alert: I fucking hate how you make me feel—because I can’t switch this shit off.",
-        ko: "VoxTek 경고: 네가 날 이렇게 느끼게 만드는 게 존나 싫어. 이 감정을 꺼낼 수가 없다는 게 더 좆같아."
+
+      // 폭주
+      frenzy: {
+        en: "VoxTek alert: Fuck Hell, fuck Heaven, and fuck all of you. As long as I wipe that smile off Alastor's fucking face, I don’t care what happens.",
+        ko: "VoxTek 경고: 지옥도 좆같고, 천국도 좆같고, 너희 전부 다 엿먹어. 알래스터 그 좆같은 얼굴에서 웃음만 지울 수만 있다면… 그 다음엔 뭐가 박살나든 좆도 상관없어."
       },
+
+      // 불안
       anxiety: {
         en: "VoxTek status: I can process infinity, but not the bullshit reason you make my signal shake.",
         ko: "VoxTek 상태: 난 무한한 데이터를 처리하면서도, 네가 내 신호를 흔들어대는 이 좆같은 이유는 처리하지 못했어."
       },
+
+      // 오만
       pride: {
         en: "VoxTek broadcast: Of course I can handle this—I'm Vox, bitch!",
         ko: "VoxTek 방송: 이 정도쯤은 당연히 처리하지! 내가 누군데, 복스라고, 개년아!"
       },
+
+      // 열등감
       shame: {
         en: "VoxTek hidden file: Don't fucking look at me right now… I can't stand the pathetic version of myself you'd see.",
         ko: "VoxTek 숨김 파일: 지금은 씨발 쳐다보지 마… 네 눈에 비칠 이 한심한 꼴을 내가 도저히 견딜 수가 없어."
       },
+
+      // 복스테크
+      voxtek: {
+        en: "VoxTek core: Every screen is mine—every signal obeys me. So sit the fuck down.",
+        ko: "VoxTek 코어: 이 지옥의 모든 화면은 다 내 거고, 모든 신호는 내 명령에 굴복해. 그러니까 좆까고 얌전히 앉아 있어."
+      },
+
+      // 해즈빈호텔
+      hazbin: {
+        en: "VoxTek scan: That hotel’s whole ‘redemption’ shtick is adorable—still useless as fuck.",
+        ko: "VoxTek 스캔: 그 호텔의 그 ‘구원’ 지랄, 아주 귀엽네—그래봤자 좆도 쓸모 없지만."
+      },
+
+      // 지옥
+      hell: {
+        en: "VoxTek feed: Hell isn’t theirs anymore—it’s mine. Redeem? Peace? Fuck that up. And I’m the most powerful sinner in Hell!",
+        ko: "VoxTek 피드: 지옥은 이제 그놈들 것이 아니야. 이젠 전부 내 거라고. 구원? 평화? 좆까. 다 엿먹으라 그래. 내가 이 지옥에서 가장 강력한 죄인이니까!"
+      },
+
+      // 알래스터
       alastor: {
         en: "VoxTek interference: Fuck you, Alastor—why does your damn presence always corrupt my stability?",
-        ko: "VoxTek 간섭: 씨발, 알래스터—왜 네 좆같은 존재만으로도 내 안정성이 매번 무너지는 거지?"
+        ko: "VoxTek 간섭: 씨발, 알래스터——왜 네 좆같은 존재만으로도 내 시스템 안정성이 죄다 뒤틀리는 건데?"
+      },
+
+      // 벨벳
+      velvette: {
+        en: "VoxTek memo: Velvette, darling—your chaos is cute until it fucks with my schedule.",
+        ko: "VoxTek 메모: 벨벳, 자기야——네 그 지랄맞은 혼돈은 귀여워. 내 스케줄만 안 조지면 말이야."
+      },
+
+      // 발렌티노
+      valentino: {
+        en: "VoxTek alert: …Fuck. My company, my empire, my image—now in your hands? Cute. You really expect me to accept that?",
+        ko: "VoxTek 경고: …젠장. 내 회사, 내 제국, 내 이미지——전부 네게 넘어갔다는 걸 내가 인정해야 한다고? 웃기지 마."
+      },
+
+      // 상어 (SHOK.WAV)
+      shark: {
+        en: "VoxTek marine note: SHOK.WAV, who's the biggest and deadliest boy? …Yeah, you are.",
+        ko: "VoxTek 해양 노트: SHOK.WAV, 세상에서 제일 크고 멋진 녀석은 누구야? …맞아, 너지."
+      },
+
+      // 찰리
+      charlie: {
+        en: "VoxTek sentiment filter: Charlie’s optimism is so blinding I have to dim my own fucking screen.",
+        ko: "VoxTek 감정 필터: 찰리의 낙관은 너무 눈부셔서, 내가 내 화면 밝기를 줄여야 할 지경이야."
+      },
+
+      // 루시퍼
+      lucifer: {
+        en: "VoxTek broadcast: Hail Vox Populi—Lucifer can’t touch a single sinner. No wonder Lilith dumped your useless ass.",
+        ko: "VoxTek 방송: 복스 포퓰리를 경배하라——루시퍼는 죄인 하나 못 건드리는 무능한 병신이지. 릴리스가 너 같은 쓸모없는 놈을 버린 건 당연해."
+      },
+
+      // 엔젤
+      angel: {
+        en: "VoxTek lock: You think you can slip away from the Vees, bitch? You’ll never crawl out of my fucking grip.",
+        ko: "VoxTek 잠금장치: 우리 Vees에서 도망칠 수 있을 것 같아, 개년아? 넌——내 손아귀에서 절대 못 벗어나."
       }
     };
 
     const logBox = document.getElementById("log");
     const statusPill = document.getElementById("status-pill");
     const lastSignal = document.getElementById("last-signal");
-    const body = document.body;
+    const emotionMain = document.querySelector(".panel");
 
-    // 간단한 비프음 (Web Audio API)
+    // ===== 사운드 =====
     function playBeep(isAlastor = false) {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -463,22 +1014,54 @@
         const ctx = new AudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-
         osc.type = "square";
         osc.frequency.value = isAlastor ? 420 : 760;
         gain.gain.value = 0.08;
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
+        osc.connect(gain); gain.connect(ctx.destination);
         osc.start();
+        setTimeout(() => { osc.stop(); ctx.close(); }, isAlastor ? 220 : 130);
+      } catch (e) {}
+    }
+
+    let alastorCtx = null;
+    function playAlastorBGM() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        if (alastorCtx) { try { alastorCtx.close(); } catch (e) {} alastorCtx = null; }
+
+        const ctx = new AudioContext(); alastorCtx = ctx;
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        osc1.type = "sawtooth"; osc2.type = "triangle";
+        osc1.frequency.value = 95; osc2.frequency.value = 101;
+        const gain = ctx.createGain(); gain.gain.value = 0.07;
+
+        const bufferSize = 2 * ctx.sampleRate;
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.25;
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuffer; noise.loop = true;
+        const noiseGain = ctx.createGain(); noiseGain.gain.value = 0.03;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = "lowpass"; filter.frequency.value = 800;
+
+        osc1.connect(gain); osc2.connect(gain); gain.connect(filter);
+        noise.connect(noiseGain); noiseGain.connect(filter);
+
+        const master = ctx.createGain(); master.gain.value = 0.0;
+        filter.connect(master); master.connect(ctx.destination);
+
+        osc1.start(); osc2.start(); noise.start();
+        master.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.7);
+        master.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 8);
         setTimeout(() => {
-          osc.stop();
-          ctx.close();
-        }, isAlastor ? 220 : 130);
-      } catch (e) {
-        // 사운드 실패는 조용히 무시
-      }
+          try { osc1.stop(); osc2.stop(); noise.stop(); ctx.close(); } catch (e) {}
+          alastorCtx = null;
+        }, 8500);
+      } catch (e) {}
     }
 
     function setStatus(mode, emotionText) {
@@ -495,18 +1078,18 @@
       lastSignal.textContent = "LAST SIGNAL: " + (emotionText || "---");
     }
 
+    // ===== Emotion Firewall =====
     function triggerEmotion() {
       const input = document.getElementById("emotionInput");
       const emotion = input.value.trim();
       const now = new Date();
       const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-        .toISOString()
-        .replace("T", " ")
-        .split(".")[0];
+        .toISOString().replace("T", " ").split(".")[0];
 
-      // 기본 모드 초기화
-      logBox.classList.remove("vox-mode", "alastor-mode", "shake");
-      body.classList.remove("alastor-flash");
+      // 초기화
+      logBox.className = "card";
+      logBox.classList.remove("vox-mode", "alastor-mode", "shake", "frenzy-mode");
+      document.body.classList.remove("alastor-flash", "frenzy-bg");
 
       const type = emotionTypeMap[emotion];
       const isEmpty = !emotion;
@@ -514,11 +1097,14 @@
       if (type) {
         const desc = emotionDescriptions[type];
         const isAlastor = type === "alastor";
+        const isFrenzy = type === "frenzy";
 
-        // 카드 컬러 모드
         if (isAlastor) {
           logBox.classList.add("alastor-mode", "shake");
-          body.classList.add("alastor-flash");
+          document.body.classList.add("alastor-flash");
+        } else if (isFrenzy) {
+          logBox.classList.add("frenzy-mode");
+          document.body.classList.add("frenzy-bg");
         } else {
           logBox.classList.add("vox-mode");
         }
@@ -549,32 +1135,46 @@ ERROR LOG REPORT
 End of Report
 ------------------------------------------------------------`;
 
-        // 설명 라인 추가 (영/한 한 세트)
-        const descWrapper = document.createElement("div");
-        descWrapper.className = "desc-line " + (isAlastor ? "desc-alastor" : "");
-        const enLine = document.createElement("div");
-        const koLine = document.createElement("div");
-        enLine.className = "desc-en";
-        koLine.className = "desc-ko";
-        enLine.textContent = desc.en;
-        koLine.textContent = desc.ko;
+        const wrap = document.createElement("div");
+        wrap.className = "desc-line " + (isAlastor ? "desc-alastor" : "");
+        const en = document.createElement("div");
+        const ko = document.createElement("div");
+        en.className = "desc-en";
+        ko.className = "desc-ko";
 
-        descWrapper.appendChild(enLine);
-        descWrapper.appendChild(koLine);
-        logBox.appendChild(descWrapper);
+        // 폭주라면 텍스트에 광기 잔떨림 부여
+        if (isFrenzy) {
+          en.classList.add("frenzy-text");
+          ko.classList.add("frenzy-text");
+        }
+
+        en.textContent = desc.en;
+        ko.textContent = desc.ko;
+        wrap.appendChild(en);
+        wrap.appendChild(ko);
+        logBox.appendChild(wrap);
 
         setStatus("error", emotion);
-        playBeep(isAlastor);
 
-        // 플래시 효과 제거 타이머
-        setTimeout(() => {
-          body.classList.remove("alastor-flash");
-          logBox.classList.remove("shake");
-        }, 600);
+        if (isAlastor) {
+          playAlastorBGM();
+        } else if (isFrenzy) {
+          playBeep(true);
+          // 배경 펄스는 잠시 후 자동 해제
+          setTimeout(() => {
+            document.body.classList.remove("frenzy-bg");
+          }, 2500);
+        } else {
+          playBeep(true);
+        }
 
+        if (isAlastor) {
+          setTimeout(() => {
+            document.body.classList.remove("alastor-flash");
+            logBox.classList.remove("shake");
+          }, 600);
+        }
       } else {
-        // 제한되지 않은 감정 (200 OK)
-        logBox.className = "card";
         logBox.textContent =
 `[200 OK] Emotion '${isEmpty ? "NULL" : emotion}' processed successfully.
 
@@ -586,6 +1186,236 @@ End of Report
         playBeep(false);
       }
     }
+
+    // ===== AUX 패널 =====
+    const infoPanel = document.getElementById("info-panel");
+    const infoTitle = document.getElementById("info-title");
+    const infoContent = document.getElementById("info-content");
+    const btnEmotions = document.getElementById("btn-emotions");
+    const btnCreator = document.getElementById("btn-creator");
+    const btnCCTV = document.getElementById("btn-cctv");
+    const topButtons = [btnEmotions, btnCreator, btnCCTV];
+
+    function clearTopButtonActive() { topButtons.forEach(b => b.classList.remove("active")); }
+    function openPanel() { infoPanel.classList.add("active"); }
+    function closePanel() {
+      infoPanel.classList.remove("active");
+      clearTopButtonActive();
+      if (emotionMain) emotionMain.style.display = "flex";
+    }
+
+    // 감정 목록 패널
+    function renderEmotionPanel() {
+      infoTitle.textContent = "EMOTION INDEX";
+      infoContent.innerHTML = "";
+      const wrap = document.createElement("div");
+      wrap.className = "emotion-list-groups";
+
+      const g1 = document.createElement("div");
+      g1.className = "emotion-group";
+      g1.innerHTML = `<div class="emotion-group-title">PRIMARY</div>`;
+      ["사랑","그리움","폭주","불안","오만","열등감"].forEach(label => {
+        const pill = document.createElement("span");
+        pill.className = "emotion-pill";
+        pill.textContent = label;
+        pill.onclick = () => { emotionInput.value = label; triggerEmotion(); };
+        g1.appendChild(pill);
+      });
+
+      const g2 = document.createElement("div");
+      g2.className = "emotion-group";
+      g2.innerHTML = `<div class="emotion-group-title">WORLD</div>`;
+      ["복스테크","해즈빈호텔","지옥"].forEach(label => {
+        const pill = document.createElement("span");
+        pill.className = "emotion-pill";
+        pill.textContent = label;
+        pill.onclick = () => { emotionInput.value = label; triggerEmotion(); };
+        g2.appendChild(pill);
+      });
+
+      const g3 = document.createElement("div");
+      g3.className = "emotion-group";
+      g3.innerHTML = `<div class="emotion-group-title">ENTITIES</div>`;
+      ["알래스터","벨벳","발렌티노","상어","찰리","루시퍼","엔젤"].forEach(label => {
+        const pill = document.createElement("span");
+        pill.className = "emotion-pill";
+        pill.textContent = label;
+        pill.onclick = () => { emotionInput.value = label; triggerEmotion(); };
+        g3.appendChild(pill);
+      });
+
+      wrap.appendChild(g1);
+      wrap.appendChild(g2);
+      wrap.appendChild(g3);
+      infoContent.appendChild(wrap);
+    }
+
+    // 제작자 패널
+    function renderCreatorPanel() {
+      infoTitle.textContent = "CREATOR";
+      infoContent.innerHTML = `
+        <div class="creator-card">
+          <div class="creator-main">
+            🕶 Director · <span>V-Sync</span>
+          </div>
+          <div class="creator-sub">
+            ──Thank you for taking an interest in the creator.
+          </div>
+        </div>
+      `;
+    }
+
+    // CCTV 패널
+    let cctvInitialized = false;
+
+    function renderCCTVLoading() {
+      infoTitle.textContent = "CCTV // ROUTING";
+      infoContent.innerHTML = `
+        <div class="cctv-loading">
+          𝐕𝐨𝐱'𝐬 𝐒𝐮𝐫𝐯𝐞𝐢𝐥𝐥𝐚𝐧𝐜𝐞 𝐑𝐨𝐨𝐦으로 이동중...
+          <span class="cctv-dots"><span></span><span></span><span></span></span>
+        </div>
+      `;
+    }
+
+    function renderCCTVPanel() {
+      infoTitle.textContent = "CCTV // SURVEILLANCE ROOM";
+      infoContent.innerHTML = `
+        <div class="cctv-grid">
+          <div class="monitor" data-cam="1">
+            <div class="monitor-screen screen-cam1"></div><div class="monitor-label">CAM 01</div>
+          </div>
+          <div class="monitor" data-cam="2">
+            <div class="monitor-screen screen-cam2"></div><div class="monitor-label">CAM 02</div>
+          </div>
+          <div class="monitor" data-cam="3">
+            <div class="monitor-screen screen-cam3"></div><div class="monitor-label">CAM 03</div>
+          </div>
+          <div class="monitor" data-cam="4">
+            <div class="monitor-screen screen-noise"></div><div class="monitor-label">CAM 04</div>
+          </div>
+          <div class="monitor" data-cam="5">
+            <div class="monitor-screen screen-noise"></div><div class="monitor-label">CAM 05</div>
+          </div>
+          <div class="monitor" data-cam="6">
+            <div class="monitor-screen screen-cam6"></div><div class="monitor-label">CAM 06</div>
+          </div>
+          <div class="monitor" data-cam="7">
+            <div class="monitor-screen screen-cam7"></div><div class="monitor-label">CAM 07</div>
+          </div>
+          <div class="monitor" data-cam="8">
+            <div class="monitor-screen screen-cam8"></div><div class="monitor-label">CAM 08</div>
+          </div>
+        </div>
+        <div id="camera-viewer" class="camera-viewer">
+          <div class="camera-view-label">NO FEED SELECTED</div>
+          <div class="camera-view-screen"></div>
+          <div class="camera-desc">Select a monitor to view its feed.</div>
+        </div>
+      `;
+      const monitors = infoContent.querySelectorAll(".monitor");
+      monitors.forEach(m => {
+        m.addEventListener("click", () => {
+          monitors.forEach(x => x.classList.remove("active"));
+          m.classList.add("active");
+          openCamera(parseInt(m.getAttribute("data-cam"), 10));
+        });
+      });
+      cctvInitialized = true;
+    }
+
+    function openCamera(cam) {
+      const viewer = document.getElementById("camera-viewer");
+      if (!viewer) return;
+      const label = viewer.querySelector(".camera-view-label");
+      const screen = viewer.querySelector(".camera-view-screen");
+      const desc = viewer.querySelector(".camera-desc");
+      viewer.classList.add("active");
+      screen.innerHTML = "";
+      const inner = document.createElement("div");
+      inner.className = "screen-inner";
+
+      if (cam === 1) {
+        inner.classList.add("screen-cam1");
+        label.textContent = "CAM 01 // HELL STREET RIOT";
+        desc.textContent = "지옥 거리 한복판, 악마들이 치고받는 난장판. 건물은 불타오르고, 전쟁 같은 소음이 화면 밖까지 번진다.";
+      } else if (cam === 2) {
+        inner.classList.add("screen-cam2");
+        label.textContent = "CAM 02 // CLUB OVERLOAD";
+        desc.textContent = "지옥 클럽 내부. 네온 불빛 속에서 악마들이 춤추고, 마시고, 토하고, 모든 게 과부하 상태로 뒤엉켜 있다.";
+      } else if (cam === 3) {
+        inner.classList.add("screen-cam3");
+        label.textContent = "CAM 03 // VOXTEK OFFICE";
+        desc.textContent = "책상 줄이 끝도 없이 이어지는 VoxTek 사무실. 좀비처럼 일만 하는 사원들의 실루엣이 화면 가득하다.";
+      } else if (cam === 4 || cam === 5) {
+        inner.classList.add("screen-noise");
+        label.textContent = `CAM 0${cam} // NO SIGNAL`;
+        desc.textContent = "연결되지 않은 채널. 흑백 노이즈만 지직거릴 뿐, 아무도, 아무것도 잡히지 않는다.";
+      } else if (cam === 6) {
+        inner.classList.add("screen-cam6");
+        label.textContent = "CAM 06 // ALASTOR FEED";
+        desc.textContent = "알래스터의 실루엣 같은 무언가가 프레임 안에서 흐릿하게 일그러진다. 화면은 심하게 지직거리며 잡음을 토해낸다.";
+        playAlastorBGM();
+      } else if (cam === 7) {
+        inner.classList.add("screen-cam7");
+        label.textContent = "CAM 07 // PENTAGRAM SKYLINE";
+        desc.textContent = "펜타그램 시티 스카이라인. 네온 간판과 빌딩 실루엣이 연기 속에서 깜빡이며, 끝이 보이지 않는 도시가 아래로 펼쳐진다.";
+      } else if (cam === 8) {
+        inner.classList.add("screen-cam8");
+        label.textContent = "CAM 08 // HAZBIN HOTEL LOBBY";
+        desc.textContent = "해즈빈 호텔 로비. 따뜻한 조명 아래 소파와 기둥이 그림자로 겹쳐지고, 어딘가 불길한 정적이 깔려 있다.";
+      }
+
+      screen.appendChild(inner);
+    }
+
+    // 버튼 이벤트
+    btnEmotions.addEventListener("click", () => {
+      if (btnEmotions.classList.contains("active")) {
+        closePanel();
+        return;
+      }
+      clearTopButtonActive();
+      btnEmotions.classList.add("active");
+      if (emotionMain) emotionMain.style.display = "flex";
+      openPanel();
+      renderEmotionPanel();
+    });
+
+    btnCreator.addEventListener("click", () => {
+      if (btnCreator.classList.contains("active")) {
+        closePanel();
+        return;
+      }
+      clearTopButtonActive();
+      btnCreator.classList.add("active");
+      if (emotionMain) emotionMain.style.display = "none";
+      openPanel();
+      renderCreatorPanel();
+    });
+
+    btnCCTV.addEventListener("click", () => {
+      if (btnCCTV.classList.contains("active")) {
+        closePanel();
+        return;
+      }
+      clearTopButtonActive();
+      btnCCTV.classList.add("active");
+      if (emotionMain) emotionMain.style.display = "none";
+      openPanel();
+      renderCCTVLoading();
+      setTimeout(() => { renderCCTVPanel(); }, 800);
+    });
+
+    // 패널 밖 클릭 시 닫기
+    document.addEventListener("click", (e) => {
+      const withinPanel = infoPanel.contains(e.target);
+      const withinButtons = e.target.closest(".top-controls");
+      if (!withinPanel && !withinButtons) closePanel();
+    });
+
+    // 부팅 후 상태 초기화
+    setTimeout(() => { setStatus("idle"); }, 2700);
   </script>
 </body>
 </html>
