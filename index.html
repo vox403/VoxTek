@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VoxTek Emotion Firewall – CCTV x8</title>
+  <title>VoxTek Emotion Firewall : CCTV x8</title>
   <style>
     :root {
       --vox-blue: #46b9ff;
@@ -31,7 +31,7 @@
       overflow-y: auto;
     }
 
-    /* 전체 UI 확대 */
+    /* 살짝 확대 */
     @media (min-width: 900px) {
       #app {
         transform: scale(1.15);
@@ -119,7 +119,7 @@
       100% { transform: translateX(0); }
     }
 
-    /* 폭주(FRENZY) 전용 이펙트 – 카드 살짝 기울어짐 */
+    /* 폭주 전용 이펙트 - 카드 살짝 기울어짐 */
     .frenzy-mode {
       position: relative;
       animation: frenzy-skew 0.18s alternate infinite;
@@ -137,7 +137,7 @@
       100% { transform: translate(1px,-1px); }
     }
 
-    /* 폭주 시 전체 배경 펄스 */
+    /* 폭주 전체 배경 펄스 */
     body.frenzy-bg {
       animation: frenzyPulse 0.8s ease-in-out 0s 6;
     }
@@ -359,7 +359,7 @@
       box-shadow: 0 0 6px rgba(70,185,255,0.6);
     }
 
-    /* 제작자 */
+    /* 제작자 패널 */
     .creator-card { padding-top: 8px; }
     .creator-main { font-size: 13px; margin-bottom: 4px; }
     .creator-main span { color: var(--vox-blue-soft); }
@@ -775,7 +775,7 @@
       pointer-events: none;
     }
 
-    /* 기본 상태 + 일반 감정에 쓰일 스캔라인 효과 */
+    /* 기본 상태 + 일반 감정 효과 */
     .card.scanline::after {
       background: linear-gradient(90deg, transparent, #555, transparent);
       animation: scanline 4s linear infinite;
@@ -786,7 +786,7 @@
       100% { top: 100%; }
     }
 
-    /* 폭주 전용 붉은 격자 오버레이 */
+    /* 폭주 전용 붉은 격자 - 면 */
     .frenzy-overlay {
       position: absolute;
       inset: 0;
@@ -864,10 +864,10 @@
   </style>
 </head>
 <body>
-  <!-- 부팅 / 로딩 화면 -->
+  <!-- boot stub · quick mock -->
   <div id="boot-screen">
     <div id="boot-logo">VOXTEK</div>
-    <div id="boot-sub">INITIALIZING EMOTION FIREWALL...</div>
+    <div id="boot-sub">BOOTING EMOTION FIREWALL...</div>
     <div id="boot-bar"><div id="boot-bar-fill"></div></div>
   </div>
 
@@ -906,7 +906,7 @@
   </div>
 
   <script>
-    // ===== 감정 매핑 =====
+    // 감정 키워드 → 내부 타입 매핑
     const emotionTypeMap = {
       // 기본 감정
       "사랑": "love",
@@ -932,6 +932,7 @@
       "엔젤": "angel"
     };
 
+    // 실제 출력 메시지들
     const emotionDescriptions = {
       // 사랑
       love: {
@@ -1013,8 +1014,8 @@
 
       // 찰리
       charlie: {
-        en: "VoxTek sentiment filter: Charlie Morningstar’s optimism is so blinding I have to dim my own fucking screen.",
-        ko: "VoxTek 감정 필터: 찰리 모닝스타의 낙관은 너무 눈부셔서, 내가 내 화면 밝기를 줄여야 할 지경이야."
+        en: "VoxTek filter: Charlie Morningstar’s optimism is so blinding I have to dim my own fucking screen.",
+        ko: "VoxTek 필터: 찰리 모닝스타의 낙관은 너무 눈부셔서, 내가 내 화면 밝기를 줄여야 할 지경이야."
       },
 
       // 루시퍼
@@ -1026,7 +1027,7 @@
       // 엔젤
       angel: {
         en: "VoxTek lock: You think you can slip away from the Vees, bitch? You’ll never crawl out of my fucking grip.",
-        ko: "VoxTek 잠금장치: 우리 Vees에서 도망칠 수 있을 것 같아, 개년아? 넌——내 손아귀에서 절대 못 벗어나."
+        ko: "VoxTek 잠금: 우리 Vees에서 도망칠 수 있을 것 같아, 개년아? 넌——내 손아귀에서 절대 못 벗어나."
       }
     };
 
@@ -1035,7 +1036,7 @@
     const lastSignal = document.getElementById("last-signal");
     const emotionMain = document.querySelector(".panel");
 
-    // ===== 사운드 =====
+    // 간단 비프 사운드
     function playBeep(isAlastor = false) {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1107,7 +1108,7 @@
       lastSignal.textContent = "LAST SIGNAL: " + (emotionText || "---");
     }
 
-    // ===== Emotion Firewall =====
+    // Emotion Firewall 메인 로직
     function triggerEmotion() {
       const input = document.getElementById("emotionInput");
       const emotion = input.value.trim();
@@ -1119,7 +1120,7 @@
       logBox.className = "card";
       logBox.classList.remove("vox-mode", "alastor-mode", "shake", "frenzy-mode", "scanline");
       document.body.classList.remove("alastor-flash", "frenzy-bg");
-      logBox.textContent = ""; // 내용 초기화 (이전에 붙어있던 overlay 제거용)
+      logBox.textContent = "";
 
       const type = emotionTypeMap[emotion];
       const isEmpty = !emotion;
@@ -1133,14 +1134,12 @@
           logBox.classList.add("alastor-mode", "shake", "scanline");
           document.body.classList.add("alastor-flash");
         } else if (isFrenzy) {
-          // 폭주: 빨간 테두리 + 흔들림 + skew
           logBox.classList.add("alastor-mode", "frenzy-mode", "shake");
           document.body.classList.add("frenzy-bg");
         } else {
           logBox.classList.add("vox-mode", "scanline");
         }
 
-        // 기본 에러 로그 텍스트
         const baseText =
 `------------------------------------------------------------
 ERROR LOG REPORT
@@ -1160,7 +1159,7 @@ ERROR LOG REPORT
 
 [System Response]
     - Locking emotion channel...
-    - Activating VoxTek emotional firewall...
+    - Activating VoxTek emotion firewall...
     - Suppressing unauthorized emotional output...
 
 ------------------------------------------------------------
@@ -1168,7 +1167,6 @@ End of Report
 ------------------------------------------------------------`;
         logBox.textContent = baseText;
 
-        // 텍스트 설명 영역
         const wrap = document.createElement("div");
         wrap.className = "desc-line " + (isAlastor ? "desc-alastor" : isFrenzy ? "desc-frenzy" : "");
         const en = document.createElement("div");
@@ -1176,7 +1174,6 @@ End of Report
         en.className = "desc-en";
         ko.className = "desc-ko";
 
-        // 폭주라면 텍스트에 광기 잔떨림 부여
         if (isFrenzy) {
           en.classList.add("frenzy-text");
           ko.classList.add("frenzy-text");
@@ -1188,7 +1185,6 @@ End of Report
         wrap.appendChild(ko);
         logBox.appendChild(wrap);
 
-        // 폭주라면 붉은 격자 오버레이 추가
         if (isFrenzy) {
           const overlay = document.createElement("div");
           overlay.className = "frenzy-overlay";
@@ -1205,7 +1201,6 @@ End of Report
           }, 600);
         } else if (isFrenzy) {
           playBeep(true);
-          // 배경 펄스는 잠시 후 자동 해제
           setTimeout(() => {
             document.body.classList.remove("alastor-flash", "frenzy-bg");
           }, 2500);
@@ -1227,7 +1222,7 @@ End of Report
       }
     }
 
-    // ===== AUX 패널 =====
+    // AUX 패널
     const infoPanel = document.getElementById("info-panel");
     const infoTitle = document.getElementById("info-title");
     const infoContent = document.getElementById("info-content");
@@ -1299,12 +1294,12 @@ End of Report
             🕶 Director · <span>V-Sync</span>
           </div>
           <div class="creator-sub">
-  ── Interest in the creator detected.<br>
-  ── 창작자에 대한 관심 신호 감지.<br><br>
-  ── Acknowledgment signal transmitted. Thank you.<br>
-  ── 확인 응답 전송 완료. 감사합니다.
-</div>
-
+            ── Interest in the creator detected.<br>
+            ── 창작자에 대한 관심 신호 감지.<br><br>
+            ── Acknowledgment signal transmitted. Thank you.<br>
+            ── 확인 응답 전송 완료. 감사합니다.
+          </div>
+        </div>
       `;
     }
 
